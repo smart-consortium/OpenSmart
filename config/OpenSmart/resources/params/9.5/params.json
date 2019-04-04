@@ -1,0 +1,68 @@
+{
+	"version": 9.5,
+	"caption": "",
+	"videos": [],
+	"build": [
+		{
+			"tag": "encode",
+			"command": "encode",
+			"options": {
+				"type": "HLS",
+				"bit_rates": [
+					{
+						"video": "540k",
+						"audio": "32k",
+						"max_rate": "578k"
+					},
+					{
+						"video": "810k",
+						"audio": "32k",
+						"max_rate": "879k"
+					}
+				]
+			}
+		},
+		{
+			"tag": "deploy",
+			"command": "deploy",
+			"options": {
+				"camera": [
+					{
+						"name": "camera #01",
+						"still": {
+							"method": "compute",
+							"size": "",
+							"times": "",
+							"source": ""
+						},
+						"thumbnail": {
+							"method": "compute",
+							"size": "",
+							"source": "",
+							"times": "",
+							"options": {
+								"range": [
+									0,
+									999999999
+								],
+								"total": 50
+							}
+						},
+						"vtrack": {
+							"playForward": {
+								"dstRange": [
+									0,
+									999999999
+								],
+								"srcRange": [
+									0,
+									999999999
+								]
+							}
+						}
+					}
+				]
+			}
+		}
+	]
+}

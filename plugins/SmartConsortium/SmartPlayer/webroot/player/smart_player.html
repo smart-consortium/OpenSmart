@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<!-- Version 0.3.2 -->
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title></title>
+        <style type="text/css">
+            html {
+                overflow: hidden;
+            }
+            html, body {
+                height: 100%;
+                min-width: 360px;
+                margin: 0px;
+                border: 0px;
+                padding: 0px;
+                background-color: #606060;
+            }
+            #VideoPlayer {
+                position:relative;
+                left: 0px;
+                top: 0px;
+                width: 100%;
+                height: 80%;
+                overflow: hidden;
+                background-color: #484848;
+            }
+            #PlayerCore {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+            }
+            #CanvasOverlay {
+                position: absolute;
+                top: 0px;
+            }
+            #SvgOverlay {
+                position: absolute;
+                top: 0px;
+                width: 100%;
+                height: 0%;
+            }
+            #SmartPlayerUI {
+                position: absolute;
+                top: 0px;
+                width: 100%;
+            }
+            .tooltip {
+                position: absolute;
+                top: 0px;
+                left: 200px;
+                font-size: 11px;
+                box-shadow: 5px 5px 5px #000000;
+                background-color: #ffff00;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="VideoPlayer"></div>
+        <div id="SmartPlayerUI"></div>
+        <canvas id="CanvasOverlay"></canvas>
+        <svg id="SvgOverlay"></svg>
+
+        <script src="lib/hls.min.js"></script>
+        <script src="lib/require.js"></script>
+        <script>
+            ////////
+            // global functions
+            var onPlayerCoreLoad;
+            var onPlayerCoreError;
+            // script file path configuration
+            require.config({
+                paths: {
+                    SmartPlayer: "scripts/SmartPlayer-0.3.3",
+                    SmartEngine: "scripts/SmartEngineModule-0.2.1",
+                    SmoothStreaming: "scripts/SmoothStreamingDevice-0.2.2",
+                    Html5Video: "scripts/Html5VideoDevice-0.2.3",
+                    NullVideo: "scripts/NullVideoDevice-0.2.2",
+                    StillPlayer: "scripts/StillPlayer-0.3.2",
+                    UserInterface: "scripts/UserInterface-0.4.3",
+                    SVGPlane: "scripts/SVGPlane-0.3.1",
+                    Include: "scripts/Include-0.1.4",
+                    Utility: "scripts/Utility-0.1.2"
+                }
+            });
+            // setup SmartPlayer
+            require([
+                "SmoothStreaming", "Html5Video", "NullVideo", "SmartPlayer", "Include", "Utility"],
+                    function (ssvideo, html5video, nullvidoe, smartplayer, inc, util) {
+                        var PLAYER_TYPE_NULL = 0;
+                        var PLAYER_TYPE_VE = 1; // VideoElement by HTML5
+                        var PLAYER_TYPE_SS = 2; // SmoothStreaming by Silverlight
+                        //
+                        var playerObject = null;
+                        var extSvgObject;
+                        //
+                        var platform = "";
+                        var oscpuinf = "";
+                        var silverlightPlugin = false;
+                        var connect = false;
+                        var limit = 30;
+                        var curPlayerType = -1;
+                        //
+                        // define functions
+                        function sendMessage(msg) {
+                            if (connect) {
+                                window.parent.postMessage(msg, "*");
+                            }
+                        }
+                        function sendReport(s) {
+                            sendMessage({"response": inc.MSG_REPORT, "param": [s]});
+                        }
+                        function toggleFullScreen() {
+                            var cmap = util.getFullScreenCmdMap(document);
+                            var doc = window.parent.document;
+                            if (Boolean(doc[cmap.fullscreenElement])) {
+                                doc[cmap.exitFullscreen]();
+                            } else {
+                                window.frameElement[cmap.requestFullscreen]();
+                            }
+                        }
+                        function ejectPlayerObject() {
+                            if (playerObject !== null) {
+                                playerObject.ejectSource();
+                                playerObject = null;
+                            }
+                            var rn = document.getElementById("PlayerCore");
+                            if (rn && rn.parentNode) {
+                                rn.parentNode.removeChild(rn);
+                            }
+                        }
+                        function constructPlayerElement(src, apf, start) {
+                            var SVG_NS = "http://www.w3.org/2000/svg";
+                            //
+                            function prepareSource(src, done, err) {
+                                var nf = false;
+                                //
+                                if ((/^http/i).test(src)) {
+                                    nf = ((/.csm$/i).test(src) || (/.ism\/Manifest$/).test(src));
+                                    nf = nf || ((/.m3u8$/i).test(src));
+                                    nf = nf || ((/.mp4$/i).test(src))
+                                    //
+                                    if (!nf) {
+                                        // src is url of SVID
+                                        var httpReq = new XMLHttpRequest();
+                                        httpReq.onload = function () {
+                                            if (200 === httpReq.status) {
+                                                // response may be SVID text
+                                                done(httpReq.response);
+                                            } else {
+                                                err(src);
+                                            }
+                                        };
+                                        httpReq.open("GET", src, true);
+                                        httpReq.send();
+                                    } else {
+                                        // src may be url of video-file
+                                        // buildup SVID text
+                                        var svid = {};
+                                        svid[inc.SV_CAPTION] = src;
+                                        svid[inc.SV_VERSION] = inc.MIN_VERSION;
+                                        svid[inc.SV_VIDEO] = {};
+                                        if ((/.csm$/i).test(src) || (/.ism\/Manifest$/).test(src)) {
+                                            svid[inc.SV_VIDEO][inc.SV_SS] = src;
+                                        } else if ((/.m3u8$/i).test(src)) {
+                                            svid[inc.SV_VIDEO][inc.SV_HLS] = src;
+                                        } else {
+                                            svid[inc.SV_VIDEO][inc.SV_DEFAULT] = src;
+                                        }
+                                        done(JSON.stringify(svid));
+                                    }
+                                } else {
+                                    // src may be SVID text
+                                    done(src);
+                                }
+                            }
+                            //
+                            if (src === "") {
+                                return;
+                            }
+                            prepareSource(src, function (svidtext) {
+                                var device;
+                                var ss = false, ve = false;
+                                // text may be SVID
+                                // check available video-format
+                                try {
+                                    var svid = JSON.parse(svidtext);
+                                    if (!svid[inc.SV_VIDEO]) {
+                                        sendReport("no " + inc.SV_VIDEO + " in SVID");
+                                        return;
+                                    } else {
+                                        ss = ([inc.SV_SS] in svid[inc.SV_VIDEO]);
+                                        ve = ([inc.SV_HLS] in svid[inc.SV_VIDEO]) || ([inc.SV_MP4] in svid[inc.SV_VIDEO]);
+                                    }
+                                } catch (e) {
+                                    sendReport("Invalid SVID: " + svidtext);
+                                    return;
+                                }
+                                // determine PlayerType
+                                if (ss && silverlightPlugin) {
+                                    curPlayerType = PLAYER_TYPE_SS;
+                                } else {
+                                    curPlayerType = (ve) ? PLAYER_TYPE_VE : PLAYER_TYPE_NULL;
+                                }
+                                // select player-device
+                                if (curPlayerType === PLAYER_TYPE_VE) {
+                                    device = html5video;
+                                } else if (curPlayerType === PLAYER_TYPE_SS) {
+                                    device = ssvideo;
+                                } else {
+                                    device = nullvidoe;
+                                }
+                                // create Smart-Player with selected device
+                                // setup event handlers on createCoreElement of device
+                                onPlayerCoreLoad = device.loadEvent;
+                                onPlayerCoreError = device.errorEvent;
+                                device.setCoreCreateEvent(function (core) {
+                                    // when core has been setupped then we create smart-player
+                                    var videoPlayer = device.createVideoPlayer(core, window, document);
+                                    // setup event handlers
+                                    playerObject = smartplayer.create(videoPlayer, window, document);
+                                    playerObject.setPointerEvent(function (state, x, y) {
+                                        sendMessage({"response": inc.MSG_MOUSE_EVENT, "param": [state, x, y]});
+                                    });
+                                    playerObject.setFullScreenEvent(function () {
+                                        toggleFullScreen();
+                                    });
+                                    playerObject.setReportEvent(function (s) {
+                                        sendReport(s);
+                                    });
+                                    playerObject.loadSource(svidtext, apf, start);
+                                    sendMessage({"response": "loaded"});
+                                });
+                                // create CoreElement of device
+                                device.createCoreElement("VideoPlayer", window, document);
+                            }), function (url) {
+                                // "err" callback function
+                                alert("failed to get <" + url + ">");
+                            };
+                        }
+                        ////////
+                        // start here
+                        // check platform and "Silverlight" plugin
+                        platform = util.getPlatform(window);
+                        oscpuinf = window.navigator.oscpu;
+                        silverlightPlugin = util.isSilverlightPlugin(window);
+                        // regist eventListeners for size chenge
+                        window.addEventListener("resize", function () {
+                            if (util.isIosDevice(window)) {
+                                // iPad work-around
+                                sendReport("iPAD work-around")
+                                playerObject.resize(window.innerWidth / 8, window.innerHeight / 8);
+                                window.setTimeout(function () {
+                                    playerObject.resize(window.innerWidth, window.innerHeight);
+                                }, 10);
+                            } else {
+                                playerObject.resize(window.innerWidth, window.innerHeight);
+                            }
+                        }, false);
+                        // regist message handler
+                        window.addEventListener("message", function (m) {
+                            if (!m.data) {
+                                return;
+                            }
+                            switch (m.data.command) {
+                                case "ping":
+                                    connect = true;
+//                                    sendReport(window.navigator.platform);
+                                    sendReport("platform:" + platform + ((oscpuinf) ? " (" + oscpuinf + ")" : ""));
+                                    break;
+                                case "loadSvgScript":
+                                    // add external svg-script
+                                    // then get "SvgObject" whitch defined in svg-script 
+                                    var target = document.getElementsByTagName("script")[0];
+                                    var svgScript = document.createElement("script");
+                                    svgScript.onload = function () {
+                                        extSvgObject = createSvgObject("SvgOverlay", document);
+                                        if (["setSvgEvent"] in extSvgObject) {
+                                            extSvgObject.setSvgEvent(function (eo) {
+                                                sendMessage({"response": inc.MSG_SVG_EVENT, "param": [eo]});
+                                            });
+                                        }
+                                    };
+                                    svgScript.src = m.data.src;
+                                    target.parentNode.insertBefore(svgScript, target);
+                                    break;
+                                case "runSvgFunc":
+                                    if (extSvgObject) {
+                                        if (extSvgObject[m.data.name]) {
+                                            var rsp = extSvgObject[m.data.name].apply(null, m.data.param);
+                                            if (m.data.callback) {
+                                                sendMessage({"response": m.data.callback, "param": [rsp]});
+                                            }
+                                        }
+                                    }
+                                    break;
+                                case "eject":
+                                    ejectPlayerObject();
+                                    document.getElementById("VideoPlayer").innerHTML = "";
+                                    break;
+                                case "load":
+                                    var s = m.data.source;
+                                    // check text-scheme input
+                                    if ((/^text/i).test(s)) {
+                                        // src is SVID-text, so we drop "text://"
+                                        s = s.replace(/^text:\/\//i, "");
+                                    }
+                                    ejectPlayerObject();
+                                    window.setTimeout(function () {
+                                        constructPlayerElement(s, m.data.autoplay);
+                                    }, 100);
+                                    break;
+                                case "control":
+                                    if (playerObject) {
+                                        playerObject.operate(m.data.code);
+                                    }
+                                    break;
+                                case "getPosition":
+                                    if (m.data.callback && (playerObject)) {
+                                        var pos = playerObject.getPosition();
+                                        sendMessage({response: m.data.callback, param: [pos]});
+                                    }
+                                    break;
+                                case "setPosition":
+                                    if (m.data.position && (playerObject)) {
+                                        playerObject.setPosition(m.data.position);
+                                    }
+                                    break;
+                                case "getArea":
+                                    if (m.data.callback && (playerObject)) {
+                                        var area = playerObject.getArea();
+                                        sendMessage({response: m.data.callback, param: [area]});
+                                    }
+                                    break;
+                                case "setArea":
+                                    if (m.data.area && (playerObject)) {
+                                        playerObject.setArea(m.data.area);
+                                    }
+                                    break;
+                                case "zoom":
+                                    if (playerObject) {
+                                        playerObject.setZoom(m.data.code);
+                                    }
+                                    break;
+                                case "getStillPicture":
+                                    if (m.data.callback && (playerObject)) {
+                                        var du = playerObject.getStillPicture();
+                                        sendMessage({response: m.data.callback, param: [du]});
+                                    }
+                                    break;
+                                case "setTestbench":
+                                    if (playerObject) {
+                                        playerObject.setTestbenchMode(m.data.code);
+                                    }
+                                    break;
+                                case "test":
+                                    playerObject.resize(window.innerWidth, window.innerHeight);
+//                                    playerObject.test();
+                                    break;
+                            }
+                        }, false);
+                        // setup linking to connector
+                        (function requestLink() {
+                            limit--;
+                            if (limit < 0) {
+//                               alert("smart_player: cann't link to owner window");
+                            }
+                            if (!connect && (limit >= 0)) {
+                                window.parent.postMessage({"response": "ping"}, "*");
+                                window.setTimeout(requestLink, 200);
+                            }
+                        })();
+                        // construct SMART-player
+                        try {
+                            if (window.name === "") {
+                                constructPlayerElement("", false);
+                            } else {
+                                try {
+                                    var p = JSON.parse(window.name);
+                                    if (p) {
+                                        constructPlayerElement(p.source, p.autoplay, p.starttime);
+                                    }
+                                } catch (e) {
+                                    constructPlayerElement(window.name, true);
+                                }
+                            }
+                        } catch (e) {
+                            alert("smart_player: Fatal error at construct player: " + e.toString());
+                        }
+                    }
+            );
+        </script>
+    </body>
+</html>
+

@@ -1,0 +1,14 @@
+{
+    "name": "SmartConsortium/SmartPlayer",
+    "description": "SmartPlayer plugin for CakePHP",
+    "type": "cakephp-plugin",
+    "license": "",
+    "require": {
+        "cakephp/cakephp": "^3.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "SmartConsortium\\SmartPlayer\\": "src/"
+        }
+    }
+}

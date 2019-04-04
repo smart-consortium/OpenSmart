@@ -1,0 +1,14 @@
+{
+	"version": 9.5,
+	"caption": "",
+	"build": [
+		{
+			"tag": "bundle",
+			"command": "bundle",
+			"options": {
+				"camera": [
+				]
+			}
+		}
+	]
+}

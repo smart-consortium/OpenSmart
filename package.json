@@ -1,0 +1,30 @@
+{
+	"name": "OpenSmart",
+	"version": "0.1.0",
+	"description": "[![Build Status](https://img.shields.io/travis/cakephp/app/master.svg?style=flat-square)](https://travis-ci.org/cakephp/app) [![License](https://img.shields.io/packagist/l/cakephp/app.svg?style=flat-square)](https://packagist.org/packages/cakephp/app)",
+	"directories": {
+		"test": "tests"
+	},
+	"scripts": {
+		"build": "browserify config/OpenSmart/Scripts/main.js > webroot/js/bundle.js",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://masahiro_ehara@bitbucket.org/masahiro_ehara/opensmart.git"
+	},
+	"author": "masahiro ehara <masahiro.ehara@irona.co.jp>",
+	"license": "MIT",
+	"homepage": "https://bitbucket.org/masahiro_ehara/opensmart#readme",
+	"dependencies": {
+		"bootstrap": "^4.0.0",
+		"jquery": "^3.3.1",
+		"jquery-file-upload": "^4.0.11",
+		"jquery-ui": "^1.12.1",
+		"popper.js": "^1.12.9",
+		"ztip": "^1.0.0"
+	},
+	"devDependencies": {
+		"browserify": "^15.2.0"
+	}
+}

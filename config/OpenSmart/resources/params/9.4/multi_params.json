@@ -1,0 +1,35 @@
+{
+    "version": 9.4,
+    "caption": "",
+    "build": [
+        {
+            "tag": "wait_all",
+            "monitor": [
+            ],
+            "command": "api/v1/wait"
+        },
+        {
+            "command": "api/v1/multi",
+            "tag": "deploy",
+            "ism": "main",
+            "dir": "m3u8",
+            "camera": [
+                {
+                    "name": "camera #01",
+                    "svid": ""
+                },
+                {
+                    "name": "camera #02",
+                    "svid": ""
+                }
+            ]
+        }
+    ],
+    "html": [
+        {
+            "tag": "deploy",
+            "command": "api/v1/multi",
+            "next": ""
+        }
+    ]
+}

@@ -1,0 +1,31 @@
+msgid "App Name"
+msgstr "OpenSmart"
+
+msgid "msg_post_video_finished"
+msgstr "POST Video finished => {0}"
+
+msgid "msg_post_video_failed"
+msgstr "Post video failed"
+
+#command result messages.
+msgid "msg_build_success"
+msgstr "Build success"
+
+msgid "msg_build_failed"
+msgstr "Build failed"
+
+msgid "msg_encode_start"
+msgstr "Encode started : [target => {0}, video => {1}, audio => {2}]"
+
+msgid "msg_encode_success"
+msgstr "Encode success : [target => {0}, video => {1}, audio => {2}]"
+
+msgid "msg_encode_failed"
+msgstr "Encode failed : [target => {0}, video => {1}, audio => {2}]"
+
+#detail messages
+msgid "msg_detail_illegal_command"
+msgstr "Illegal command string : {0}"
+
+msgid "msg_detail_make_directory_failed"
+msgstr "Directory create failed: {0}"

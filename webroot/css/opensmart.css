@@ -1,0 +1,163 @@
+/*
+ * OpenSmart :
+ * Copyright (c) Smart Consortium. (https://smart-consortium.org)
+ * Licensed under The MIT License
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @author      masahiro ehara <masahiro.ehara@irona.co.jp>
+ * @copyright   Copyright (c) Smart Consortium. (https://smart-consortium.org)
+ * @link        https://smart-consortium.org OpenSmart Project
+ * @since       1.0.0
+ * @license     https://opensource.org/licenses/mit-license.php MIT License
+ */
+
+#video_container {
+    float: left;
+    width: 70%;
+}
+
+#video_actions {
+    float: left;
+}
+
+.top-bar.expanded .title-area {
+    background: #1C1C1C;
+}
+
+.top-bar.expanded, .top-bar, .top-bar-section ul li, .top-bar-section li:not(.has-form) a:not(.button) {
+    background: #393939;
+}
+
+.top-bar-section li:not(.has-form) a:not(.button):hover {
+    background: #393939;
+}
+
+.json-view-cell {
+    height: 300px;
+    overflow: scroll;
+}
+
+a:hover {
+    color: rgb(69, 161, 207);
+}
+
+a {
+    color: rgb(0, 122, 183);
+}
+
+.side-nav li a:not(.button) {
+    color: rgb(0, 122, 183);
+}
+
+.side-nav li a:not(.button):hover {
+    color: rgb(69, 161, 207);
+}
+
+.side-nav li.heading, .vertical-table th, table tr th {
+    color: rgb(50, 97, 171);
+}
+
+.content .related {
+    float: right;
+    width: 30%;
+    height:480px;
+}
+
+.content h3 {
+    color: rgb(116, 65, 153);
+}
+
+
+.build_status, .job_status {
+    border-radius: 2px;
+    color: #fff;
+    padding: 2px;
+}
+
+.status_success {
+    background: #3a945b;
+}
+
+.status_waiting {
+    background: #6F6F6F;
+}
+
+.status_building, .status_processing {
+    background: #003f54;
+}
+
+.status_failed {
+    background: #C3232D;
+}
+
+.preview_image {
+    object-fit: contain;
+    width: auto;
+}
+
+.link_button {
+    border-radius: 4px;
+    display: inline-block;
+    padding: 10px;
+    margin: 5px;
+}
+
+.link_button > a {
+    color: #fff;
+
+}
+
+.rebuild_button {
+    background: #003f54;
+}
+
+.delete_button {
+    background: #C3232D;
+}
+
+.view_button {
+    background: #3a945b;
+}
+
+.edit_button {
+    background: #3a945b;
+}
+
+*, *:before, *:after {
+    box-sizing: border-box;
+}
+
+.col_5 {
+    width: 100%;
+    display: flex;
+    display: -ms-flexbox; /* IE10 */
+    flex-wrap: wrap;
+    -ms-flex-wrap: wrap; /* IE10 */
+}
+
+.col_5 > div {
+    word-wrap: break-word;
+    font-size: small;
+    width: 20%;
+    padding: 10px;
+}
+
+.col_5 > div > .caption {
+    font-size: medium;
+}
+
+.col_5 > div > div {
+    position: relative;
+    overflow: hidden
+}
+
+.col_5 > div > .img_box {
+    height: 120px;
+}
+
+.col_5 > div > .img_processing {
+    width: 100%;
+    border: 1px solid black;
+    padding: 50px 70px
+}

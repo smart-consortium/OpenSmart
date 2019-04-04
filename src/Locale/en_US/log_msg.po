@@ -1,0 +1,70 @@
+# Execute shell / task
+msgid "log_msg_start_shell"
+msgstr "Start shell : {0}"
+
+msgid "log_msg_end_shell"
+msgstr "End shell : {0} : status => {1}"
+
+# Execute sub task
+msgid "log_msg_start_sub_task"
+msgstr "Start sub task : {0}"
+
+msgid "log_msg_end_sub_task"
+msgstr "End sub task : {0} : status => {1}"
+
+msgid "log_msg_post_video"
+msgstr "HTTP POST video file : {0}"
+
+msgid "log_msg_move_uploaded_file_failed"
+msgstr "Move uploaded file failed"
+
+msgid "log_msg_make_parameter_json"
+msgstr "Make parameter for {0}"
+
+msgid "log_msg_load_params_failed"
+msgstr "Load parameter.json failed"
+
+msgid "log_msg_file_not_found"
+msgstr "File not found : {0}"
+
+msgid "log_msg_image_create_success"
+msgstr "Image file created : {0}"
+
+msgid "log_msg_image_create_failure"
+msgstr "Can not create a image file : {0}"
+
+msgid "log_msg_directory_create_failed"
+msgstr "Make directory failed : {0}"
+
+msgid "log_msg_directory_remove_failed"
+msgstr "Remove directory failed : {0}"
+
+msgid "log_msg_illegal_command_name"
+msgstr "Illegal command name : {0}"
+
+msgid "log_msg_illegal_argument"
+msgstr "Illegal argument : {0} => {1}"
+
+#shell
+msgid "log_msg_exec_shell_command"
+msgstr "Execute shell command: {0}"
+
+msgid "log_msg_exec_time_ms"
+msgstr "Processing time : {0} ms."
+
+msgid "log_msg_call_shell_command"
+msgstr "Call shell command : {0}"
+
+msgid "log_msg_exec_shell_returns"
+msgstr "Shell command returns: {0}"
+
+msgid "log_msg_exec_shell_output"
+msgstr "Shell command outs: {0}"
+
+msgid "log_msg_shell_option_not_found"
+msgstr "Option -{0} ( -{1} ) is required"
+
+
+#DB
+msgid "log_msg_update_table_failed"
+msgstr "Update table '{0}' failed."

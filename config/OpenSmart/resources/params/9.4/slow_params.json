@@ -1,0 +1,99 @@
+{
+    "version": 9.4,
+    "caption": "",
+    "build": [
+        {
+            "tag": "wait_upload",
+            "monitor": [
+                "post"
+            ],
+            "command": "api/v1/wait"
+        },
+        {
+            "outfile": "",
+            "infile": "",
+            "args": " -r 240 -i %infile% -t 8 -r 30 %outfile%",
+            "tag": "ffmpeg",
+            "background": 0,
+            "command": "api/v1/ffmpeg"
+        },
+        {
+            "tag": "wait_ffmpeg",
+            "monitor": [
+                "ffmpeg"
+            ],
+            "command": "api/v1/wait"
+        },
+        {
+            "target": "",
+            "tag": "video",
+            "command": "api/v1/manual"
+        },
+        {
+            "targets": [
+                "na250k",
+                "na380k",
+                "na578k",
+                "na879k",
+                "na1336k",
+                "na2032k"
+            ],
+            "tag": "encode",
+            "background": 0,
+            "command": "api/v1/encode"
+        },
+        {
+            "tag": "wait_encode",
+            "monitor": [
+                "video",
+                "encode"
+            ],
+            "command": "api/v1/wait"
+        },
+        {
+            "ism": "main",
+            "tag": "mp4split",
+            "command": "api/v1/mp4split"
+        },
+        {
+            "tag": "deploy",
+            "htaccess": 0,
+            "command": "api/v1/deploy",
+            "camera": [
+                {
+                    "name": "camera #01",
+                    "still": {
+                        "size": "1080x720"
+                    },
+                    "thumbnail": {
+                        "method": "compute",
+                        "size": "640x360",
+                        "options": [
+                            {
+                                "range": [
+                                    0,
+                                    999999999
+                                ],
+                                "total": 100
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "tag": "trick",
+            "ism": "main",
+            "dir": "m3u8",
+            "command": "api/v1/trick",
+            "trick": {
+                "playForward": {
+                    "range": [
+                        0,
+                        999999999
+                    ]
+                }
+            }
+        }
+    ]
+}

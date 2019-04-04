@@ -1,0 +1,76 @@
+{
+    "version": 9.4,
+    "caption": "",
+    "html": [
+        {
+            "tag": "video",
+            "command": "api/v1/manual",
+            "next": ""
+        },
+        {
+            "tag": "norm",
+            "command": "",
+            "next": ""
+        },
+        {
+            "tag": "slow",
+            "command": "",
+            "next": ""
+        },
+        {
+            "tag": "deploy",
+            "command": "api/v1/trick",
+            "next": ""
+        }
+    ],
+    "build": [
+        {
+            "tag": "wait_all",
+            "monitor": [],
+            "command": "api/v1/wait"
+        },
+        {
+            "tag": "deploy",
+            "command": "api/v1/trick",
+            "dir": "m3u8",
+            "ism": "main",
+            "camera": [
+                {
+                    "name": "camera #01",
+                    "still": {
+                        "size": "1280x720"
+                    },
+                    "thumbnail": {
+                        "method": "compute",
+                        "size": "640x360",
+                        "options": [
+                            {
+                                "range": [
+                                    0,
+                                    999999999
+                                ],
+                                "total": 100
+                            }
+                        ]
+                    }
+                }
+            ],
+            "trick": {
+                "playForward": {
+                    "svid": "",
+                    "range": [
+                        0,
+                        999999999
+                    ]
+                },
+                "slowForward": {
+                    "svid": "",
+                    "range": [
+                        0,
+                        999999999
+                    ]
+                }
+            }
+        }
+    ]
+}
