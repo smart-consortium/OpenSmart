@@ -44,3 +44,5 @@
 *.bz2 binary
 *.7z binary
 *.zip binary
+
+vendor/* linguist-vendored
